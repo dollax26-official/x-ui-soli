@@ -1,6 +1,6 @@
 # x-ui روی Railway — یک پورت، چند نودی (پنل مرکزی + نودها)
 
-English | [فارسی](./README.fa.md)
+[English](./README.md) | فارسی
 
 پنل [3x-ui](https://github.com/mhsanaei/3x-ui) نسخهٔ v3.8.5 را پشت یک reverse proxy
 با nginx روی **یک پورت واحد Railway** اجرا می‌کند؛ هم پنل وب و هم اینباند
