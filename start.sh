@@ -1,1 +1,25 @@
-#!/bin/bash\nset -e\n\necho "ðŸš€ Starting X-UI + nginx reverse proxy..."\n\n# nginx Ù‡Ù…ÛŒØ´Ù‡ Ø±ÙˆÛŒ Ù¾ÙˆØ±Øª Ø«Ø§Ø¨Øª 3000 Ú¯ÙˆØ´ Ù…ÛŒâ€ŒØ¯Ù‡Ø¯\nexport NGINX_PORT=3000\n\ncd /usr/local/x-ui\n\necho "ðŸ”§ Applying panel settings via x-ui CLI..."\n./x-ui setting -port 2053 -webBasePath /managepanel/ || true\n\necho "ðŸ”§ Building nginx.conf for fixed port: $NGINX_PORT"\nenvsubst '${NGINX_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf\n\necho "â–¶ï¸  Starting x-ui in background..."\n./x-ui &\nX_UI_PID=$!\n\nsleep 2\n\necho "â–¶ï¸  Starting nginx in foreground on port $NGINX_PORT..."\nnginx -t\nexec nginx -g "daemon off;"\n
+#!/bin/bash
+set -e
+
+echo "ðŸš€ Starting X-UI + nginx reverse proxy..."
+
+# nginx Ù‡Ù…ÛŒØ´Ù‡ Ø±ÙˆÛŒ Ù¾ÙˆØ±Øª Ø«Ø§Ø¨Øª 3000 Ú¯ÙˆØ´ Ù…ÛŒâ€ŒØ¯Ù‡Ø¯
+export NGINX_PORT=3000
+
+cd /usr/local/x-ui
+
+echo "ðŸ”§ Applying panel settings via x-ui CLI..."
+./x-ui setting -port 2053 -webBasePath /managepanel/ || true
+
+echo "ðŸ”§ Building nginx.conf for fixed port: $NGINX_PORT"
+envsubst '${NGINX_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+
+echo "â–¶ï¸  Starting x-ui in background..."
+./x-ui &
+X_UI_PID=$!
+
+sleep 2
+
+echo "â–¶ï¸  Starting nginx in foreground on port $NGINX_PORT..."
+nginx -t
+exec nginx -g "daemon off;"
