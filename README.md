@@ -16,7 +16,7 @@ multi-node feature — **the panel itself is not modified in any way**.
 | File | Role |
 | ---- | ---- |
 | `Dockerfile` | Builds the image (3x-ui + nginx + helper). |
-| `nginx.conf.template` | Single-port routing (`/managepanel/`, `/sub/`, `/`). |
+| `nginx.conf.template` | Single-port routing. Also exposes the panel API at the **root** (`/panel/`) so nodes connect automatically. |
 | `start.sh` | Starts the panel and nginx; nginx listens on Railway's `$PORT`. |
 | `node-link.sh` | Mints a node API token and prints the values to paste into the central panel. |
 
@@ -77,8 +77,12 @@ The central panel **pulls** from each node by calling the node's panel API at:
 <scheme>://<address>:<port><basePath>panel/api/...
 ```
 
-Since this wrapper serves the panel (and its `/panel/api/...`) under
-`/managepanel/`, a node is always described like this:
+**The base path is handled automatically.** The panel normally lives under
+`/managepanel/`, but this wrapper *also* serves the panel API at the **root**
+(`https://<node-domain>/panel/api/...`), transparently rewritten to the panel's
+real path. So the central panel connects with its **default** Base path — you
+just enter the host, no `/managepanel/` needed. (`/managepanel/` keeps working
+too, if you prefer to set it explicitly.)
 
 | Add-node field | Value for a Railway node |
 | -------------- | ------------------------ |
@@ -86,7 +90,7 @@ Since this wrapper serves the panel (and its `/panel/api/...`) under
 | **Scheme** | `https` |
 | **Address** | the node's Railway domain, e.g. `node-xxx.up.railway.app` (**no** `https://`) |
 | **Port** | `443` |
-| **Base path** | `/managepanel/` |
+| **Base path** | leave the **default** (`/`) — handled automatically (`/managepanel/` also works) |
 | **API token** | a token created **on the node** (see Step A) |
 | **TLS verify** | `verify` |
 | **Inbound sync** | `all` (or `selected`) |
@@ -104,7 +108,7 @@ Open the node's panel at `https://<node-domain>/managepanel/`, then either:
   Scheme:    https
   Address:   node-xxx.up.railway.app
   Port:      443
-  Base path: /managepanel/
+  Base path: /            <- leave the default (handled automatically)
   API token: <the token>
   ```
 
@@ -112,9 +116,10 @@ Open the node's panel at `https://<node-domain>/managepanel/`, then either:
 
 ### Step B — on the CENTRAL panel: paste the token + address
 
-Open the central panel → **Nodes → Add node**, fill the table above, and click
-**Test / Add**. Once the node shows **online**, the central panel reports its
-version, CPU/RAM, uptime and traffic, and pushes inbound/client edits to it.
+Open the central panel → **Nodes → Add node**, enter the **Address**, keep the
+**Base path** at its default, paste the token, and click **Test / Add**. Once the
+node shows **online**, the central panel reports its version, CPU/RAM, uptime and
+traffic, and pushes inbound/client edits to it.
 
 > A node can itself manage further nodes; the central panel shows those as
 > read-only *transitive* sub-nodes.
@@ -144,21 +149,25 @@ directly. If `PORT` isn't injected, set the service target port to `3000`.
 
 Only what is needed for reachability + node linking. **The panel is untouched.**
 
+- `nginx.conf.template` — **added one location**: `/panel/` at the root is
+  rewritten to the panel's real path, so a central panel connects with its
+  default Base path (no `/managepanel/` required). Existing `/managepanel/`,
+  `/sub/` and `/` routes are unchanged.
 - `start.sh` — nginx now binds Railway's `$PORT` (`${PORT:-3000}`) instead of a
   hard-coded 3000, so the public domain always reaches it.
 - `Dockerfile` — also copies `node-link.sh` into the image.
 - `node-link.sh` — new, optional helper.
 
-Everything else (`nginx.conf.template` routes, panel settings, inbound on 8080)
-is unchanged.
+Everything else (panel settings, inbound on 8080) is unchanged.
 
 ---
 
 ## 5. Troubleshooting
 
 - **Node offline** → check: node has a public domain; Address has no scheme;
-  Port `443`; Base path `/managepanel/`; token copied in full. Opening
-  `https://<node-domain>/managepanel/` in a browser must show the login page.
+  Port `443`; Base path left at default `/` (or `/managepanel/`); token copied in
+  full. Opening `https://<node-domain>/managepanel/` in a browser must show the
+  login page.
 - **"speaks HTTP, not HTTPS"** → set that node's Scheme to `http`.
 - **Token broke after redeploy** → no `/etc/x-ui` volume, so the node DB (and its
   token) was reset. Mount the volume, or mint a new token.
