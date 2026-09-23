@@ -89,12 +89,13 @@ https://yourdomain.up.railway.app/managepanel/
 
 3x-ui has built-in multi-node support: the central panel manages each **node**
 using an **API token** created on that node. In this architecture the panel is
-served at `/managepanel/`, so the node's **Base path** is always `/managepanel/`.
-**No panel or config change is required.**
+served at `/managepanel/`. The wrapper **also** serves the panel API at the root
+(`/panel/api/...`), so the node's **Base path** can stay at the default `/`.
+**No panel change is required.**
 
 The central panel calls a node at:
 ```
-https://<node-domain>/managepanel/panel/api/...
+https://<node-domain>/panel/api/...
 ```
 
 ### Step 1 — on the NODE: create an API key
@@ -111,7 +112,7 @@ Then **Settings → API Tokens → Create**, scope = `admin`.
 | Scheme | `https` |
 | Address | the node's domain, e.g. `node-xxx.up.railway.app` (no `https://`) |
 | Port | `443` |
-| Base path | `/managepanel/` |
+| Base path | `/` (leave the default) |
 | API token | the token from Step 1 |
 | TLS verify | `verify` |
 | Inbound sync | `all` or `selected` |

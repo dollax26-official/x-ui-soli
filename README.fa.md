@@ -79,11 +79,11 @@ https://دامنه‌شما.up.railway.app/managepanel/
 
 ## چند-نودی: وصل کردن پنل‌ها به هم (بدون تغییر در پنل)
 
-3x-ui به‌صورت داخلی از چند-نودی پشتیبانی می‌کند؛ پنل مرکزی هر «نود» را با یک **API Token** که روی خود نود ساخته می‌شود، مدیریت می‌کند. در این معماری، پنل روی مسیر `/managepanel/` سرو می‌شود، پس مقدار **Base path** نود همیشه `/managepanel/` است. **هیچ تغییری در پنل یا کانفیگ لازم نیست.**
+3x-ui به‌صورت داخلی از چند-نودی پشتیبانی می‌کند؛ پنل مرکزی هر «نود» را با یک **API Token** که روی خود نود ساخته می‌شود، مدیریت می‌کند. این پکیج API پنل را از ریشه (`/panel/api/...`) هم سرو می‌کند، پس مقدار **Base path** نود می‌تواند پیش‌فرض `/` بماند. **هیچ تغییری در پنل لازم نیست.**
 
 آدرس نودی که پنل مرکزی صدا می‌زند:
 ```
-https://<node-domain>/managepanel/panel/api/...
+https://<node-domain>/panel/api/...
 ```
 
 ### مرحله ۱ — روی نود: ساخت API Key
@@ -100,7 +100,7 @@ https://<node-domain>/managepanel/panel/api/...
 | Scheme | `https` |
 | Address | دامنهٔ نود، مثلاً `node-xxx.up.railway.app` (بدون `https://`) |
 | Port | `443` |
-| Base path | `/managepanel/` |
+| Base path | `/` (پیش‌فرض را دست نزنید) |
 | API token | توکن مرحلهٔ ۱ |
 | TLS verify | `verify` |
 | Inbound sync | `all` یا `selected` |
