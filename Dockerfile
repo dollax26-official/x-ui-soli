@@ -23,9 +23,6 @@ RUN set -eux; \
 
 RUN mkdir -p /etc/x-ui /var/log/x-ui
 
-# مسیر Volume برای ماندگاری دیتابیس و تنظیمات پنل (پیش‌فرض 3x-ui: /etc/x-ui)
-VOLUME ["/etc/x-ui"]
-
 COPY nginx.conf.template /etc/nginx/nginx.conf.template
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
