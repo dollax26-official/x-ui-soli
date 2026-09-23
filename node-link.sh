@@ -6,6 +6,10 @@
 # "Nodes -> Add node" dialog so this deployment can be managed as a node, and
 # (re)mints the API token the central panel will authenticate with.
 #
+# Thanks to the root /panel/ route in nginx, the central panel connects
+# automatically with the DEFAULT base path ("/") — you do NOT need to know
+# about /managepanel/. (/managepanel/ still works too.)
+#
 # Run it on THIS deployment (the node):
 #   Railway : open the service shell, or  railway run bash /node-link.sh
 #   Docker  : docker exec -it <container> bash /node-link.sh
@@ -15,7 +19,6 @@
 #   NODE_SCHEME          http|https                      (default: https)
 #   NODE_PORT            public port                     (default: 443)
 #   NODE_TOKEN_NAME      API token name to mint/rotate   (default: central)
-#   XUI_WEB_BASE_PATH    panel base path                 (default: /managepanel/)
 # ---------------------------------------------------------------------------
 set -e
 cd /usr/local/x-ui
@@ -31,7 +34,6 @@ TOKEN_RAW="$(./x-ui setting -getApiToken -tokenName "$TOKEN_NAME" 2>/dev/null \
 SCHEME="${NODE_SCHEME:-https}"
 ADDR="${NODE_PUBLIC_ADDRESS:-${RAILWAY_PUBLIC_DOMAIN:-<your-node-domain>}}"
 PORT="${NODE_PORT:-443}"
-BASEPATH="${XUI_WEB_BASE_PATH:-/managepanel/}"
 
 cat <<EOF
 
@@ -42,13 +44,14 @@ cat <<EOF
 | Scheme        | $SCHEME
 | Address       | $ADDR
 | Port          | $PORT
-| Base path     | $BASEPATH
+| Base path     | /            <- leave the default (handled automatically)
 | API token     | $TOKEN_RAW
 | TLS verify    | verify
 | Inbound sync  | all
 ================================================================
 
 Paste these into the CENTRAL panel -> Nodes -> Add node.
+You can just enter the Address; the Base path can stay at its default "/".
 EOF
 
 # Persist for reference (0600). Lives on the /etc/x-ui volume if one is mounted.
@@ -58,7 +61,7 @@ umask 077
   echo "scheme=$SCHEME"
   echo "address=$ADDR"
   echo "port=$PORT"
-  echo "basePath=$BASEPATH"
+  echo "basePath=/"
   echo "apiToken=$TOKEN_RAW"
   echo "created=$(date -u +%FT%TZ)"
 } > /etc/x-ui/node-connection.txt
