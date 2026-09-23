@@ -1,16 +1,16 @@
-# 3x-ui on Railway â€” one port (no TCP Proxy)
+# 3x-ui on Railway — one port (no TCP Proxy)
 
-[ÙØ§Ø±Ø³ÛŒ](./README.md) | English
+[فارسی](./README.fa.md) | English
 
 This repo runs [3x-ui](https://github.com/mhsanaei/3x-ui) behind an nginx reverse
 proxy so both the web panel and your VLESS/WebSocket inbound are reachable through
-a **single fixed port (3000)** â€” the same idea as the RVG setup.
+a **single fixed port (3000)** — the same idea as the RVG setup.
 
 ## Why
 
 By default 3x-ui runs the panel on one port and each inbound on another. A Railway
 Public Domain points at only **one** internal port, so you'd get either the panel
-or the inbound â€” not both. nginx puts both behind one port.
+or the inbound — not both. nginx puts both behind one port.
 
 ## Deploy
 
@@ -21,9 +21,9 @@ Create a new GitHub repo (public or private) and put these files at the root:
 - `start.sh`
 
 ### 2. In Railway
-1. **New Project â†’ Deploy from GitHub repo**, pick the repo.
+1. **New Project → Deploy from GitHub repo**, pick the repo.
 2. Railway auto-detects the `Dockerfile` and builds.
-3. When the deploy finishes, go to **Settings â†’ Networking â†’ Generate Domain**.
+3. When the deploy finishes, go to **Settings → Networking → Generate Domain**.
    The image declares **`EXPOSE 3000`**, so the port is preset to **3000**
    (nginx listens there). One domain is enough.
 
@@ -31,7 +31,7 @@ Create a new GitHub repo (public or private) and put these files at the root:
 
 | Port | Used by | Exposure |
 |---|---|---|
-| **3000** | nginx (panel + inbound + sub) | **public** â€” what `Generate Domain` targets (`EXPOSE 3000`) |
+| **3000** | nginx (panel + inbound + sub) | **public** — what `Generate Domain` targets (`EXPOSE 3000`) |
 | 2053 | 3x-ui panel | internal only |
 | 2096 | subscription server | internal only |
 | 8080 | VLESS/WebSocket inbound | internal only |
@@ -41,7 +41,7 @@ Your panel URL:
 ```
 https://yourdomain.up.railway.app/managepanel/
 ```
-Default 3x-ui credentials are `admin` / `admin` â€” change them immediately in
+Default 3x-ui credentials are `admin` / `admin` — change them immediately in
 **Settings**.
 
 ### 4. Create an inbound
@@ -50,13 +50,13 @@ Create an inbound with exactly these values:
 | Field | Value |
 |---|---|
 | Protocol | VLESS |
-| Listen Port | **8080** (must not change â€” nginx points here) |
+| Listen Port | **8080** (must not change — nginx points here) |
 | Listen IP | empty or `0.0.0.0` |
 | Network | ws |
 | Security | none |
 | Path | any, e.g. `/cdn` |
 
-âš ï¸ If you want a different inbound port, change `127.0.0.1:8080` in
+⚠️ If you want a different inbound port, change `127.0.0.1:8080` in
 `nginx.conf.template` to match, then push/redeploy.
 
 ### 5. Client link
@@ -97,13 +97,13 @@ The central panel calls a node at:
 https://<node-domain>/managepanel/panel/api/...
 ```
 
-### Step 1 â€” on the NODE: create an API key
+### Step 1 — on the NODE: create an API key
 Open the node panel: `https://<node-domain>/managepanel/`
-Then **Settings â†’ API Tokens â†’ Create**, scope = `admin`.
+Then **Settings → API Tokens → Create**, scope = `admin`.
 **Copy the token immediately** (shown only once).
 
-### Step 2 â€” on the CENTRAL panel: add the node
-**Nodes â†’ Add node** with these exact values:
+### Step 2 — on the CENTRAL panel: add the node
+**Nodes → Add node** with these exact values:
 
 | Field | Value |
 |---|---|
@@ -123,4 +123,4 @@ version/CPU/RAM/uptime/traffic and pushes inbound/client edits to it.
 - Attach a **Volume** at `/etc/x-ui` on **every node**, otherwise a redeploy wipes
   the token/users and the link breaks.
 - Every node needs a **Generate Domain** so the central panel can reach it.
-- Persian guide: [README.md](./README.md)
+- Persian guide: [README.fa.md](./README.fa.md)
